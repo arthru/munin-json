@@ -1,0 +1,5 @@
+munin-json (1.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Arthur Vuillard <arthur@hashbang.fr>  Tue, 22 Oct 2013 13:17:59 +0000

@@ -1,0 +1,16 @@
+Source: munin-json
+Section: admin
+Priority: optional
+Maintainer: Arthur Vuillard <arthur@hashbang.fr>
+Uploaders: Arthur Vuillard <arthur@hashbang.fr>
+Build-Depends: debhelper (>= 5), help2man
+Standards-Version: 3.9.4
+
+Package: munin-json
+Architecture: all
+Depends: munin,
+    cron,
+    ${misc:Depends}
+Description: Munin Json templates, to be used as a pseudo web service
+ This package adds a Munin configuration, and template, in order to provide
+ JSON files usable as readonly webservices. 
