@@ -1,0 +1,60 @@
+apache_install() {
+  # if you add more webservers here, dont forget to also remove them in postrm
+  webserver=apache2
+  webserver_init_script="/etc/init.d/$webserver"
+  if [ -d /etc/$webserver/conf.d ] && [ ! -e /etc/$webserver/conf.d/munin-json ]; then
+    if [ -z "$prevver" ] || ( dpkg --compare-versions "$prevver" ge 1.4.6-1~ && dpkg --compare-versions "$prevver" lt 1.4.7~ ) ; then
+    # only create link on new installs
+    # or when upgrading from a version where it was removed unconditionally
+    ln -s ../../munin-json/apache.conf /etc/$webserver/conf.d/munin-json
+    fi
+    if [ -f $webserver_init_script ];then
+      if [ -x $webserver_init_script ]; then
+        invoke-rc.d $webserver reload 3>/dev/null || true
+      else
+        echo "munin-json: $webserver_init_script is not executable."\
+             "Could not reload $webserver"
+      fi
+    fi
+  fi
+
+  # installing configuration for Apache 2.4
+  # link config to conf-available
+  if [ -d /etc/$webserver/conf-available ] && [ ! -e /etc/$webserver/conf-available/munin-json.conf ]; then
+    ln -s ../../munin/apache.conf /etc/$webserver/conf-available/munin-json.conf
+
+    # activate configuration on new install with apache2-mainscript-helper
+    # TODO: Migration from installed Munin with apache2.2 to apache 2.4
+    if [ -z "$prevver" ]; then
+      if [ -e /usr/share/apache2/apache2-maintscript-helper ] ; then
+        . /usr/share/apache2/apache2-maintscript-helper
+        apache2_invoke enconf munin-json.conf
+      fi
+    fi
+  fi
+}
+
+dirs(){
+  munin-json-cache=/var/cache/munin/www-json
+  if [ ! -d $munin-json-cache ] ; then
+    mkdir -p $munin-json-cache
+    chmod 755 $munin-json-cache
+    chown munin:munin $munin-json-cache
+  fi
+}
+
+case "$1" in
+  configure)
+    if [ -z "$2" ] ; then
+      apache_install
+      dirs
+    fi
+    ;;
+  abort-upgrade|abort-deconfigure|abort-remove)
+    :
+    ;;
+  *)
+    echo "Called with unknown argument $1, bailing out."
+    exit 1
+    ;;
+esac
