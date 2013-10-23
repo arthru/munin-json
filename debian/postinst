@@ -34,12 +34,12 @@ apache_install() {
   fi
 }
 
-dirs(){
-  munin-json-cache=/var/cache/munin/www-json
-  if [ ! -d $munin-json-cache ] ; then
-    mkdir -p $munin-json-cache
-    chmod 755 $munin-json-cache
-    chown munin:munin $munin-json-cache
+dirs() {
+  munin_json_cache=/var/cache/munin-json/www
+  if [ ! -d $munin_json_cache ] ; then
+    mkdir -p $munin_json_cache
+    chmod 755 $munin_json_cache
+    chown munin:munin $munin_json_cache
   fi
 }
 

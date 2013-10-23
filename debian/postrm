@@ -1,14 +1,14 @@
+webserver=apache2
 
-apache_uninstall() {
-	webserver=apache2
+apache_2_remove(){
 	if [ -e /etc/$webserver/conf.d/munin-json ]; then
 		# delete the link
 		rm -f /etc/$webserver/conf.d/munin-json
 		invoke-rc.d $webserver reload 3>/dev/null || true
 	fi
-	
-	apache_2_4_disable
+}
 
+apache_2_4_remove(){
 	# Remove configuration from Apache 2.4 conf dir
 	if [ -e /etc/$webserver/conf-available/munin-json.conf ]; then
 		# delete the link
@@ -24,10 +24,20 @@ apache_2_4_disable(){
 	fi 
 }
 
+dirs() {
+	if [ -d /var/cache/munin-json/www ] ; then
+		rm -rf /var/cache/munin-json /www
+	fi
+}
+
 if [ "$1" = "purge" ]; then
-	apache_uninstall
+	apache_2_remove
+	apache_2_4_disable
+	apache_2_4_remove
+	dirs
 fi
 
 if [ "$1" = "remove" ]; then
+	apache_2_remove
 	apache_2_4_disable
 fi
